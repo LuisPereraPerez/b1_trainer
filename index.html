@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>B1 Vocabulary Master - Cambridge & Linguaskill</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .perspective-1000 {
+      perspective: 1000px;
+    }
+    .transform-style-3d {
+      transform-style: preserve-3d;
+    }
+    .backface-hidden {
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+    .rotate-y-180 {
+      transform: rotateY(180deg);
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col antialiased">
+
+  <!-- Header -->
+  <header class="bg-indigo-900 text-white shadow-lg sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 py-3.5 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-amber-400 text-indigo-950 flex items-center justify-center font-black text-xl shadow">
+          B1
+        </div>
+        <div>
+          <h1 class="font-bold text-lg leading-tight">Cambridge & Linguaskill Trainer</h1>
+          <p class="text-xs text-indigo-200">Vocabulario Oficial CEFR B1 Preliminary</p>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="flex items-center bg-indigo-950/60 p-1 rounded-xl text-sm font-medium border border-indigo-800/60">
+        <button id="nav-flashcards" onclick="setTab('flashcards')" class="px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-2 bg-indigo-600 text-white shadow-sm">
+          <i class="fa-solid fa-layer-group"></i> <span>Flashcards</span>
+        </button>
+        <button id="nav-quiz" onclick="setTab('quiz')" class="px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-2 text-indigo-200 hover:text-white hover:bg-indigo-800/50">
+          <i class="fa-solid fa-circle-check"></i> <span>Test / Quiz</span>
+        </button>
+        <button id="nav-dictionary" onclick="setTab('dictionary')" class="px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-2 text-indigo-200 hover:text-white hover:bg-indigo-800/50">
+          <i class="fa-solid fa-book-bookmark"></i> <span>Glosario (<span id="total-words-count">0</span>)</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Category selector bar -->
+  <section class="bg-white border-b border-slate-200 shadow-sm py-2.5 px-4 sticky top-[61px] z-40">
+    <div class="max-w-6xl mx-auto flex items-center gap-2 overflow-x-auto custom-scrollbar text-xs md:text-sm font-medium py-1" id="category-chips">
+      <!-- Dynamic Category Chips -->
+    </div>
+  </section>
+
+  <!-- Main Container -->
+  <main class="max-w-6xl mx-auto px-4 py-6 flex-1 w-full">
+
+    <!-- ============================================== -->
+    <!-- VIEW 1: FLASHCARDS -->
+    <!-- ============================================== -->
+    <div id="view-flashcards" class="block space-y-6">
+      
+      <!-- Progress Bar & Actions -->
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="flex items-center gap-3 w-full sm:w-auto">
+          <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Progreso del tema:</span>
+          <div class="w-44 bg-slate-200 rounded-full h-2.5 overflow-hidden">
+            <div id="category-progress-bar" class="bg-indigo-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+          </div>
+          <span id="card-counter" class="text-xs font-bold text-indigo-900">0 / 0</span>
+        </div>
+
+        <div class="flex items-center gap-2 text-xs">
+          <button onclick="shuffleCards()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium flex items-center gap-1.5 transition">
+            <i class="fa-solid fa-shuffle"></i> Mezclar
+          </button>
+          <button onclick="resetCategoryProgress()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium flex items-center gap-1.5 transition">
+            <i class="fa-solid fa-rotate-left"></i> Reiniciar
+          </button>
+        </div>
+      </div>
+
+      <!-- Flashcard 3D Scene -->
+      <div class="max-w-xl mx-auto perspective-1000 my-4 min-h-[360px] cursor-pointer select-none" onclick="flipCard()">
+        <div id="flashcard-inner" class="relative w-full h-[360px] transform-style-3d transition-transform duration-500 rounded-3xl shadow-xl border border-slate-200 bg-white">
+          
+          <!-- Front Side -->
+          <div class="absolute inset-0 backface-hidden p-8 flex flex-col justify-between rounded-3xl bg-gradient-to-br from-white via-indigo-50/20 to-slate-50 border border-slate-100">
+            <div class="flex justify-between items-start">
+              <span id="fc-category-badge" class="px-3 py-1 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-700 tracking-wide uppercase">
+                Work & Jobs
+              </span>
+              <button onclick="event.stopPropagation(); speakWord(currentCard.word)" class="w-10 h-10 rounded-full bg-indigo-50 hover:bg-indigo-100 text-indigo-600 flex items-center justify-center transition shadow-sm" title="Escuchar pronunciación">
+                <i class="fa-solid fa-volume-high text-base"></i>
+              </button>
+            </div>
+
+            <div class="text-center my-auto space-y-3">
+              <h2 id="fc-word" class="text-4xl sm:text-5xl font-extrabold text-slate-900 tracking-tight">colleague</h2>
+              <p id="fc-pos" class="text-sm font-semibold text-indigo-500 uppercase tracking-widest italic">noun</p>
+              <p id="fc-pronounce-hint" class="text-xs text-slate-400 font-mono">B1 High Frequency</p>
+            </div>
+
+            <div class="text-center text-xs text-slate-400 flex items-center justify-center gap-1">
+              <i class="fa-solid fa-rotate"></i> Haz clic o presiona Espacio para ver el significado
+            </div>
+          </div>
+
+          <!-- Back Side -->
+          <div class="absolute inset-0 backface-hidden rotate-y-180 p-8 flex flex-col justify-between rounded-3xl bg-indigo-900 text-white shadow-2xl">
+            <div class="flex justify-between items-start">
+              <span id="fc-back-badge" class="px-3 py-1 rounded-full text-xs font-semibold bg-indigo-800 text-amber-300 uppercase tracking-wider">
+                Traducción & Contexto
+              </span>
+              <button onclick="event.stopPropagation(); speakWord(currentCard.example)" class="w-10 h-10 rounded-full bg-indigo-800 hover:bg-indigo-700 text-indigo-200 hover:text-white flex items-center justify-center transition" title="Escuchar frase de ejemplo">
+                <i class="fa-solid fa-volume-high text-base"></i>
+              </button>
+            </div>
+
+            <div class="space-y-4 my-auto">
+              <div class="border-b border-indigo-800 pb-3 text-center">
+                <h3 id="fc-translation" class="text-3xl font-bold text-amber-300">colega, compañero/a de trabajo</h3>
+                <p id="fc-definition" class="text-sm text-indigo-200 mt-1.5 italic">someone that you work with</p>
+              </div>
+              
+              <div class="bg-indigo-950/60 p-4 rounded-xl border border-indigo-800/80 text-left">
+                <span class="text-xs font-bold text-amber-400 uppercase tracking-wider block mb-1">Ejemplo B1 / Linguaskill:</span>
+                <p id="fc-example" class="text-sm sm:text-base font-medium text-slate-100">"She gets along very well with all her new colleagues."</p>
+              </div>
+            </div>
+
+            <div class="text-center text-xs text-indigo-300">
+              Usa los botones de abajo para calificar tu dominio
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Controls & Rating -->
+      <div class="max-w-xl mx-auto flex items-center justify-between gap-3">
+        <button onclick="prevCard()" class="px-4 py-3 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-2xl font-semibold shadow-sm transition flex items-center gap-2">
+          <i class="fa-solid fa-arrow-left"></i> <span class="hidden sm:inline">Anterior</span>
+        </button>
+
+        <div class="flex items-center gap-2">
+          <button onclick="markCard(false)" class="px-4 sm:px-6 py-3 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-2xl font-bold text-sm sm:text-base transition flex items-center gap-2 shadow-sm">
+            <i class="fa-solid fa-xmark"></i> Repasar
+          </button>
+          <button onclick="markCard(true)" class="px-4 sm:px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl font-bold text-sm sm:text-base transition flex items-center gap-2 shadow-md hover:shadow-lg">
+            <i class="fa-solid fa-check"></i> ¡Dominada!
+          </button>
+        </div>
+
+        <button onclick="nextCard()" class="px-4 py-3 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-2xl font-semibold shadow-sm transition flex items-center gap-2">
+          <span class="hidden sm:inline">Siguiente</span> <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+
+      <!-- Keyboard shortcuts helper -->
+      <p class="text-center text-xs text-slate-400 mt-2">
+        <kbd class="px-1.5 py-0.5 bg-slate-200 text-slate-700 rounded text-[10px]">Espacio</kbd> Girar | 
+        <kbd class="px-1.5 py-0.5 bg-slate-200 text-slate-700 rounded text-[10px]">←</kbd> / <kbd class="px-1.5 py-0.5 bg-slate-200 text-slate-700 rounded text-[10px]">→</kbd> Navegar | 
+        <kbd class="px-1.5 py-0.5 bg-slate-200 text-slate-700 rounded text-[10px]">1</kbd> Repasar | 
+        <kbd class="px-1.5 py-0.5 bg-slate-200 text-slate-700 rounded text-[10px]">2</kbd> Dominada
+      </p>
+
+    </div>
+
+    <!-- ============================================== -->
+    <!-- VIEW 2: QUIZ / TEST MODE -->
+    <!-- ============================================== -->
+    <div id="view-quiz" class="hidden space-y-6 max-w-2xl mx-auto">
+      
+      <!-- Quiz Header -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900">B1 Practice Test</h2>
+          <p class="text-xs text-slate-500" id="quiz-subtitle">Demuestra tu conocimiento del vocabulario</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="text-right">
+            <span class="text-xs text-slate-400 uppercase font-bold tracking-wider">Aciertos</span>
+            <div class="text-lg font-black text-indigo-600" id="quiz-score-display">0 / 0</div>
+          </div>
+          <button onclick="startNewQuiz()" class="p-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl transition" title="Reiniciar Quiz">
+            <i class="fa-solid fa-arrows-rotate"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quiz Card -->
+      <div id="quiz-card-container" class="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-lg space-y-6">
+        
+        <div class="flex justify-between items-center text-xs font-semibold text-slate-400">
+          <span id="quiz-question-number" class="bg-slate-100 px-3 py-1 rounded-full text-slate-700">Pregunta 1 de 10</span>
+          <span id="quiz-category-tag" class="text-indigo-600 font-bold uppercase tracking-wider">Work & Jobs</span>
+        </div>
+
+        <div class="space-y-2">
+          <h3 class="text-xs uppercase tracking-wider font-bold text-indigo-500" id="quiz-type-label">Completa la frase / Significado:</h3>
+          <p id="quiz-prompt" class="text-xl sm:text-2xl font-bold text-slate-800 leading-snug">
+            "I need to fill in this job ______ before the interview."
+          </p>
+        </div>
+
+        <!-- Options grid -->
+        <div id="quiz-options" class="grid grid-cols-1 gap-3 pt-2">
+          <!-- Dynamic options buttons -->
+        </div>
+
+        <!-- Feedback Box -->
+        <div id="quiz-feedback" class="hidden p-4 rounded-2xl border text-sm transition-all duration-200">
+          <div class="flex items-start gap-3">
+            <div id="quiz-feedback-icon" class="text-xl mt-0.5"></div>
+            <div class="space-y-1">
+              <h4 id="quiz-feedback-title" class="font-bold"></h4>
+              <p id="quiz-feedback-text" class="text-slate-600 text-xs sm:text-sm"></p>
+            </div>
+          </div>
+          <div class="mt-4 flex justify-end">
+            <button id="quiz-next-btn" onclick="nextQuizQuestion()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-sm transition flex items-center gap-2">
+              Siguiente Pregunta <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Quiz Summary Screen (Initially hidden) -->
+      <div id="quiz-summary" class="hidden bg-white p-8 rounded-3xl border border-slate-200 shadow-xl text-center space-y-6">
+        <div class="w-20 h-20 mx-auto rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-4xl shadow-inner">
+          <i class="fa-solid fa-trophy text-amber-500"></i>
+        </div>
+        <div class="space-y-2">
+          <h3 class="text-2xl font-extrabold text-slate-900">¡Quiz Completado!</h3>
+          <p class="text-slate-600 text-sm">Has terminado esta sesión de entrenamiento de nivel B1.</p>
+        </div>
+        <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100 max-w-sm mx-auto">
+          <p class="text-xs uppercase font-bold text-slate-400 tracking-wider">Tu Puntuación</p>
+          <div id="quiz-final-score" class="text-4xl font-black text-indigo-700 mt-1">8 / 10</div>
+          <p id="quiz-final-message" class="text-xs font-medium text-slate-500 mt-2">¡Muy buen nivel! Listo para el examen Linguaskill.</p>
+        </div>
+        <button onclick="startNewQuiz()" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl shadow-md transition inline-flex items-center gap-2">
+          <i class="fa-solid fa-rotate-left"></i> Intentar otro test
+        </button>
+      </div>
+
+    </div>
+
+    <!-- ============================================== -->
+    <!-- VIEW 3: DICTIONARY / GLOSSARY -->
+    <!-- ============================================== -->
+    <div id="view-dictionary" class="hidden space-y-4">
+      
+      <!-- Search & Filters -->
+      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-3 items-center justify-between">
+        <div class="relative w-full md:w-96">
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-400 text-sm"></i>
+          <input type="text" id="dict-search-input" oninput="filterDictionary()" placeholder="Buscar palabra, traducción o ejemplo..." class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition">
+        </div>
+        
+        <div class="flex items-center gap-2 w-full md:w-auto justify-between md:justify-end text-xs">
+          <span class="text-slate-500 font-medium">Mostrando <b id="dict-results-count" class="text-slate-800">0</b> palabras</span>
+          <button onclick="clearMasteryStatus()" class="text-rose-600 hover:underline">Reiniciar estado de dominio</button>
+        </div>
+      </div>
+
+      <!-- Word Table / Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="dict-cards-container">
+        <!-- Dynamic Word cards -->
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 mt-auto py-4 text-center text-xs text-slate-500">
+    <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <p>Material de estudio basado en el <b>Cambridge Preliminary B1 Vocabulary List</b> (CUPA).</p>
+      <p class="text-slate-400">Preparación para exámenes Cambridge B1 & Linguaskill</p>
+    </div>
+  </footer>
+
+  <!-- ============================================== -->
+  <!-- JAVASCRIPT APP LOGIC & DATASET -->
+  <!-- ============================================== -->
+  <script>
+    // Extensive high-yield B1 vocabulary database categorized strictly from Cambridge B1 official list
+    const B1_VOCABULARY_DATA = [
+      // WORK & JOBS
+      { id: 1, word: "colleague", pos: "noun", translation: "compañero/a de trabajo, colega", definition: "A person with whom one works in a profession or business.", example: "She gets along very well with all her new colleagues.", category: "work" },
+      { id: 2, word: "application", pos: "noun", translation: "solicitud (de empleo)", definition: "An official request for a job, place in university, etc.", example: "You need to complete an application form to apply for the position.", category: "work" },
+      { id: 3, word: "salary", pos: "noun", translation: "salario, sueldo", definition: "A fixed regular payment, typically paid on a monthly basis.", example: "He receives a competitive monthly salary and good benefits.", category: "work" },
+      { id: 4, word: "out of work", pos: "prep phr", translation: "en paro, desempleado", definition: "Without a job; unemployed.", example: "He has been out of work since the factory closed down.", category: "work" },
+      { id: 5, word: "retire", pos: "verb", translation: "jubilarse, retirarse", definition: "To leave one's job and cease to work, typically upon reaching normal age.", example: "My grandfather plans to retire when he turns 65 next month.", category: "work" },
+      { id: 6, word: "wage(s)", pos: "noun", translation: "sueldo, salario (por horas/semanas)", definition: "Money earned by an employee, especially on an hourly or weekly rate.", example: "The minimum wage has increased this year.", category: "work" },
+      { id: 7, word: "qualification", pos: "noun", translation: "titulación, cualificación", definition: "An official record of having successfully completed a course or training.", example: "What academic qualifications do you need to become an architect?", category: "work" },
+      { id: 8, word: "earn", pos: "verb", translation: "ganar (dinero con trabajo)", definition: "To obtain money in return for labor or services.", example: "She earns enough money as a web designer to travel often.", category: "work" },
+      { id: 9, word: "employer", pos: "noun", translation: "empleador, jefe, empresa", definition: "A person or organization that employs people.", example: "The company is one of the largest employers in the region.", category: "work" },
+      { id: 10, word: "employee", pos: "noun", translation: "empleado/a, trabajador/a", definition: "A person employed for wages or salary.", example: "The company has over five hundred full-time employees.", category: "work" },
+      { id: 11, word: "quit", pos: "verb", translation: "dejar (un trabajo), renunciar", definition: "To leave a place, job, or school permanently.", example: "She decided to quit her job and start her own business.", category: "work" },
+
+      // TRAVEL & TRANSPORT
+      { id: 12, word: "boarding pass", pos: "noun", translation: "tarjeta de embarque", definition: "A pass that authorizes a passenger to board an aircraft.", example: "Please have your passport and boarding pass ready at the gate.", category: "travel" },
+      { id: 13, word: "accommodation", pos: "noun", translation: "alojamiento, hospedaje", definition: "A room, group of rooms, or building in which someone may live or stay.", example: "The travel agency booked hotel accommodation near the train station.", category: "travel" },
+      { id: 14, word: "delay", pos: "noun & verb", translation: "retraso / retrasar", definition: "A period of time by which something is late or postponed.", example: "There was a two-hour flight delay due to severe weather.", category: "travel" },
+      { id: 15, word: "fare", pos: "noun", translation: "tarifa, precio del billete", definition: "The money a passenger on public transport has to pay.", example: "The return bus fare to London is twenty pounds.", category: "travel" },
+      { id: 16, word: "luggage", pos: "noun (uncountable)", translation: "equipaje, maletas", definition: "Suitcases or other bags in which to pack personal belongings.", example: "Make sure you do not leave your luggage unattended at the airport.", category: "travel" },
+      { id: 17, word: "destination", pos: "noun", translation: "destino", definition: "The place to which someone or something is going or being sent.", example: "Paris is one of the world's most popular holiday destinations.", category: "travel" },
+      { id: 18, word: "abroad", pos: "adverb", translation: "en/al extranjero", definition: "In or to a foreign country or countries.", example: "They go abroad every summer to practice speaking English.", category: "travel" },
+      { id: 19, word: "hire", pos: "verb", translation: "alquilar (un coche/servicio)", definition: "To pay for the use of something for a short period.", example: "We decided to hire a car to explore the countryside easily.", category: "travel" },
+      { id: 20, word: "on board", pos: "prep phr", translation: "a bordo", definition: "On or in an aircraft, train, ship, or other vehicle.", example: "There were two hundred passengers on board the flight.", category: "travel" },
+      { id: 21, word: "sightseeing", pos: "noun", translation: "hacer turismo, visitas turísticas", definition: "The activity of visiting places of interest in a location.", example: "We spent the entire afternoon sightseeing in historic Rome.", category: "travel" },
+
+      // PHRASAL VERBS (Key B1 Preliminary items)
+      { id: 22, word: "look forward to", pos: "phr verb", translation: "tener muchas ganas de, esperar con ilusión", definition: "To feel happy and excited about something that is going to happen (+ -ing).", example: "I am really looking forward to seeing you next weekend.", category: "phrasal" },
+      { id: 23, word: "give up", pos: "phr verb", translation: "rendirse, dejar un hábito", definition: "To stop doing or having something; quit a habit.", example: "He decided to give up smoking and eat healthier food.", category: "phrasal" },
+      { id: 24, word: "find out", pos: "phr verb", translation: "averiguar, enterarse de", definition: "To discover or obtain information about something.", example: "I need to find out what time the exam starts tomorrow.", category: "phrasal" },
+      { id: 25, word: "get along (with)", pos: "phr verb", translation: "llevarse bien (con)", definition: "To have a harmonious or friendly relationship with someone.", example: "Do you get along well with your new flatmates?", category: "phrasal" },
+      { id: 26, word: "break down", pos: "phr verb", translation: "averiarse, estropearse (vehículo/máquina)", definition: "To stop functioning or working mechanically.", example: "Our old car broke down on the motorway yesterday.", category: "phrasal" },
+      { id: 27, word: "put off", pos: "phr verb", translation: "posponer, aplazar", definition: "To postpone something to a later date.", example: "The football match was put off until next Tuesday due to heavy rain.", category: "phrasal" },
+      { id: 28, word: "run out (of)", pos: "phr verb", translation: "quedarse sin, agotarse", definition: "To use up all of something so that there is none left.", example: "We ran out of petrol before reaching the service station.", category: "phrasal" },
+      { id: 29, word: "take up", pos: "phr verb", translation: "empezar una afición / actividad", definition: "To begin to do something as a hobby or regular activity.", example: "She has just taken up photography in her free time.", category: "phrasal" },
+      { id: 30, word: "carry out", pos: "phr verb", translation: "llevar a cabo, realizar", definition: "To perform or complete a task, experiment, or instruction.", example: "Scientists will carry out research to test the new medicine.", category: "phrasal" },
+      { id: 31, word: "look after", pos: "phr verb", translation: "cuidar de alguien o algo", definition: "To take care of someone or something.", example: "Can you look after my cat while I am away on vacation?", category: "phrasal" },
+
+      // PERSONAL FEELINGS & ADJECTIVES
+      { id: 32, word: "disappointed", pos: "adjective", translation: "decepcionado/a", definition: "Sad or displeased because someone or something has failed to fulfill expectations.", example: "He was deeply disappointed with his final test results.", category: "adjectives" },
+      { id: 33, word: "embarrassed", pos: "adjective", translation: "avergonzado/a (por pena/corte)", definition: "Feeling awkward, self-conscious, or ashamed.", example: "I felt very embarrassed when I forgot my teacher's name.", category: "adjectives" },
+      { id: 34, word: "reliable", pos: "adjective", translation: "fiable, de confianza", definition: "Consistently good in quality or performance; able to be trusted.", example: "Peter is very reliable; he always arrives right on time.", category: "adjectives" },
+      { id: 35, word: "anxious", pos: "adjective", translation: "ansioso/a, inquieto/a", definition: "Experiencing worry, unease, or nervousness.", example: "She felt anxious about speaking in front of a huge audience.", category: "adjectives" },
+      { id: 36, word: "relieved", pos: "adjective", translation: "aliviado/a", definition: "No longer feeling distressed or anxious; reassured.", example: "I was very relieved when I heard that everyone was safe.", category: "adjectives" },
+      { id: 37, word: "sensible", pos: "adjective", translation: "sensato/a, prudente (¡Falso amigo!)", definition: "Possessing or displaying good sense and practical judgment.", example: "It is sensible to save some money for unexpected expenses.", category: "adjectives" },
+      { id: 38, word: "sensitive", pos: "adjective", translation: "sensible, delicado", definition: "Quick to detect or respond to slight changes or feelings.", example: "She is a sensitive artist who cares deeply about nature.", category: "adjectives" },
+      { id: 39, word: "stubborn / bossy", pos: "adjective", translation: "mandón / mandona", definition: "Fond of giving people orders; domineering.", example: "Her older sister can be a bit bossy at times.", category: "adjectives" },
+      { id: 40, word: "keen on", pos: "adjective phr", translation: "aficionado a, entusiasta de", definition: "Interested in or eager about something.", example: "My brother is extremely keen on playing guitar in a band.", category: "adjectives" },
+      { id: 41, word: "jealous", pos: "adjective", translation: "celoso/a, envidioso/a", definition: "Feeling or showing envy of someone or their achievements.", example: "He was jealous of his friend's brand-new computer.", category: "adjectives" },
+
+      // HEALTH, MEDICINE & FITNESS
+      { id: 42, word: "prescription", pos: "noun", translation: "receta médica", definition: "An instruction written by a medical doctor that authorizes medicine.", example: "You cannot buy these antibiotics without a doctor's prescription.", category: "health" },
+      { id: 43, word: "recover", pos: "verb", translation: "recuperarse, restablecerse", definition: "To return to a normal state of health, mind, or strength.", example: "It took him two weeks to recover from the bad flu.", category: "health" },
+      { id: 44, word: "sore throat", pos: "noun", translation: "dolor de garganta", definition: "A condition marked by pain in the throat, typically caused by inflammation.", example: "I have got a painful sore throat and a high fever.", category: "health" },
+      { id: 45, word: "injure", pos: "verb", translation: "lesionar(se), herir(se)", definition: "To do physical harm or damage to someone.", example: "The striker injured his knee during the football match.", category: "health" },
+      { id: 46, word: "bleed", pos: "verb", translation: "sangrar", definition: "To lose blood from the body as a result of injury.", example: "Wash the cut gently if your finger starts to bleed.", category: "health" },
+      { id: 47, word: "appointment", pos: "noun", translation: "cita (médica, profesional)", definition: "An arrangement to meet someone at a particular time and place.", example: "I have made an appointment to see the dentist on Friday.", category: "health" },
+      { id: 48, word: "workout", pos: "noun", translation: "sesión de entrenamiento, ejercicio", definition: "A session of vigorous physical exercise or training.", example: "I do a thirty-minute workout at the gym every morning.", category: "health" },
+
+      // TECHNOLOGY & COMMUNICATIONS
+      { id: 49, word: "attach", pos: "verb", translation: "adjuntar (un archivo)", definition: "To join or fasten something to something else (e.g., file to an email).", example: "Don't forget to attach your updated CV to the job email.", category: "technology" },
+      { id: 50, word: "device", pos: "noun", translation: "dispositivo, aparato", definition: "An item of equipment made for a particular purpose.", example: "Smartphones are essential electronic devices in daily life.", category: "technology" },
+      { id: 51, word: "download", pos: "verb & noun", translation: "descargar / descarga", definition: "To copy data from one computer system to another, typically over the internet.", example: "You can download the exam practice app directly to your phone.", category: "technology" },
+      { id: 52, word: "hardware", pos: "noun (uncountable)", translation: "hardware, componentes físicos", definition: "The mechanical, magnetic, and electronic equipment of a computer.", example: "They upgraded all their computer hardware in the office.", category: "technology" },
+      { id: 53, word: "password", pos: "noun", translation: "contraseña", definition: "A secret word or phrase that must be used to gain admission to a place or computer system.", example: "Choose a strong password that combines letters and numbers.", category: "technology" },
+      { id: 54, word: "upload", pos: "verb", translation: "subir (archivos a la red)", definition: "To transfer data from a device to a larger computer system or server.", example: "She uploaded the video clip to her social media account.", category: "technology" },
+
+      // SHOPPING & SERVICES
+      { id: 55, word: "bargain", pos: "noun", translation: "ganga, chollo", definition: "A thing bought or offered for sale more cheaply than is usual.", example: "This leather jacket was a real bargain at half price!", category: "shopping" },
+      { id: 56, word: "receipt", pos: "noun", translation: "recibo, tique de compra", definition: "A written acknowledgment that a specified article or sum of money has been received.", example: "Keep your receipt in case you want to exchange the shirt.", category: "shopping" },
+      { id: 57, word: "refund", pos: "noun & verb", translation: "reembolso / devolver el dinero", definition: "A repayment of a sum of money, or to give back money.", example: "They gave me a full refund because the appliance was damaged.", category: "shopping" },
+      { id: 58, word: "affordable / inexpensive", pos: "adjective", translation: "económico, asequible", definition: "Reasonably priced; not expensive.", example: "The restaurant offers delicious food at very affordable prices.", category: "shopping" },
+      { id: 59, word: "in advance", pos: "prep phr", translation: "con antelación, por adelantado", definition: "Ahead of time; beforehand.", example: "You must book the concert tickets at least a week in advance.", category: "shopping" }
+    ];
+
+    const CATEGORIES = [
+      { key: "all", label: "Todos los temas", icon: "fa-earth-americas" },
+      { key: "work", label: "Work & Jobs", icon: "fa-briefcase" },
+      { key: "travel", label: "Travel & Transport", icon: "fa-plane-departure" },
+      { key: "phrasal", label: "Phrasal Verbs", icon: "fa-bolt" },
+      { key: "adjectives", label: "Feelings & Adjectives", icon: "fa-face-smile" },
+      { key: "health", label: "Health & Fitness", icon: "fa-heart-pulse" },
+      { key: "technology", label: "Technology & Media", icon: "fa-laptop" },
+      { key: "shopping", label: "Shopping & Services", icon: "fa-basket-shopping" }
+    ];
+
+    // State Variables
+    let currentCategory = "all";
+    let activeCards = [];
+    let currentCardIndex = 0;
+    let isFlipped = false;
+    let masteryState = {}; // { wordId: true/false }
+
+    // Quiz State
+    let quizQuestions = [];
+    let currentQuizIndex = 0;
+    let quizScore = 0;
+    let quizAnswered = false;
+
+    // Initialize App
+    window.addEventListener('DOMContentLoaded', () => {
+      loadMasteryState();
+      renderCategoryChips();
+      updateTotalWordsCount();
+      filterCardsByCategory('all');
+      renderDictionary();
+      setupKeyboardShortcuts();
+    });
+
+    // Local Storage for Mastery
+    function loadMasteryState() {
+      try {
+        const saved = localStorage.getItem('b1_mastery_state');
+        if (saved) masteryState = JSON.parse(saved);
+      } catch (e) {
+        masteryState = {};
+      }
+    }
+
+    function saveMasteryState() {
+      try {
+        localStorage.setItem('b1_mastery_state', JSON.stringify(masteryState));
+      } catch (e) {}
+    }
+
+    function clearMasteryStatus() {
+      if (confirm("¿Quieres reiniciar el progreso de todas las palabras?")) {
+        masteryState = {};
+        saveMasteryState();
+        updateProgressBar();
+        renderDictionary();
+      }
+    }
+
+    // Navigation Tabs
+    function setTab(tab) {
+      document.getElementById('view-flashcards').classList.toggle('hidden', tab !== 'flashcards');
+      document.getElementById('view-quiz').classList.toggle('hidden', tab !== 'quiz');
+      document.getElementById('view-dictionary').classList.toggle('hidden', tab !== 'dictionary');
+
+      const tabs = ['flashcards', 'quiz', 'dictionary'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`nav-${t}`);
+        if (t === tab) {
+          btn.className = "px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-2 bg-indigo-600 text-white shadow-sm font-medium";
+        } else {
+          btn.className = "px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-2 text-indigo-200 hover:text-white hover:bg-indigo-800/50 font-medium";
+        }
+      });
+
+      if (tab === 'quiz') {
+        startNewQuiz();
+      } else if (tab === 'dictionary') {
+        renderDictionary();
+      }
+    }
+
+    // Category Chips
+    function renderCategoryChips() {
+      const container = document.getElementById('category-chips');
+      container.innerHTML = CATEGORIES.map(cat => `
+        <button onclick="filterCardsByCategory('${cat.key}')" id="chip-${cat.key}" class="px-3.5 py-1.5 rounded-xl whitespace-nowrap transition-all flex items-center gap-1.5 ${currentCategory === cat.key ? 'bg-indigo-900 text-white font-bold shadow-sm' : 'bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium'}">
+          <i class="fa-solid ${cat.icon} text-xs"></i> <span>${cat.label}</span>
+        </button>
+      `).join('');
+    }
+
+    function filterCardsByCategory(catKey) {
+      currentCategory = catKey;
+      renderCategoryChips();
+      
+      if (catKey === 'all') {
+        activeCards = [...B1_VOCABULARY_DATA];
+      } else {
+        activeCards = B1_VOCABULARY_DATA.filter(item => item.category === catKey);
+      }
+
+      currentCardIndex = 0;
+      isFlipped = false;
+      renderCurrentCard();
+      updateProgressBar();
+      renderDictionary();
+    }
+
+    function updateTotalWordsCount() {
+      document.getElementById('total-words-count').innerText = B1_VOCABULARY_DATA.length;
+    }
+
+    // Flashcard Render & Flip
+    let currentCard = null;
+
+    function renderCurrentCard() {
+      if (activeCards.length === 0) return;
+      currentCard = activeCards[currentCardIndex];
+
+      const inner = document.getElementById('flashcard-inner');
+      if (isFlipped) {
+        inner.classList.remove('rotate-y-180');
+        isFlipped = false;
+      }
+
+      // Front
+      document.getElementById('fc-word').innerText = currentCard.word;
+      document.getElementById('fc-pos').innerText = currentCard.pos;
+      const catObj = CATEGORIES.find(c => c.key === currentCard.category) || { label: currentCard.category };
+      document.getElementById('fc-category-badge').innerText = catObj.label;
+
+      // Back
+      document.getElementById('fc-translation').innerText = currentCard.translation;
+      document.getElementById('fc-definition').innerText = `"${currentCard.definition}"`;
+      document.getElementById('fc-example').innerText = `"${currentCard.example}"`;
+
+      // Counter
+      document.getElementById('card-counter').innerText = `${currentCardIndex + 1} / ${activeCards.length}`;
+      updateProgressBar();
+    }
+
+    function flipCard() {
+      const inner = document.getElementById('flashcard-inner');
+      isFlipped = !isFlipped;
+      if (isFlipped) {
+        inner.classList.add('rotate-y-180');
+      } else {
+        inner.classList.remove('rotate-y-180');
+      }
+    }
+
+    function nextCard() {
+      if (currentCardIndex < activeCards.length - 1) {
+        currentCardIndex++;
+        renderCurrentCard();
+      } else {
+        currentCardIndex = 0;
+        renderCurrentCard();
+      }
+    }
+
+    function prevCard() {
+      if (currentCardIndex > 0) {
+        currentCardIndex--;
+        renderCurrentCard();
+      } else {
+        currentCardIndex = activeCards.length - 1;
+        renderCurrentCard();
+      }
+    }
+
+    function shuffleCards() {
+      for (let i = activeCards.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [activeCards[i], activeCards[j]] = [activeCards[j], activeCards[i]];
+      }
+      currentCardIndex = 0;
+      renderCurrentCard();
+    }
+
+    function markCard(mastered) {
+      if (!currentCard) return;
+      masteryState[currentCard.id] = mastered;
+      saveMasteryState();
+      updateProgressBar();
+      nextCard();
+    }
+
+    function updateProgressBar() {
+      if (activeCards.length === 0) return;
+      const masteredCount = activeCards.filter(c => masteryState[c.id] === true).length;
+      const pct = Math.round((masteredCount / activeCards.length) * 100);
+      document.getElementById('category-progress-bar').style.width = `${pct}%`;
+    }
+
+    function resetCategoryProgress() {
+      activeCards.forEach(c => {
+        delete masteryState[c.id];
+      });
+      saveMasteryState();
+      updateProgressBar();
+      currentCardIndex = 0;
+      renderCurrentCard();
+    }
+
+    // Text to Speech
+    function speakWord(text) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const cleanText = text.replace(/["']/g, "");
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        utterance.lang = 'en-GB';
+        utterance.rate = 0.9;
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    // Keyboard Shortcuts
+    function setupKeyboardShortcuts() {
+      window.addEventListener('keydown', (e) => {
+        if (document.getElementById('view-flashcards').classList.contains('hidden')) return;
+        if (e.target.tagName === 'INPUT') return;
+
+        if (e.code === 'Space') {
+          e.preventDefault();
+          flipCard();
+        } else if (e.code === 'ArrowRight') {
+          nextCard();
+        } else if (e.code === 'ArrowLeft') {
+          prevCard();
+        } else if (e.key === '1') {
+          markCard(false);
+        } else if (e.key === '2') {
+          markCard(true);
+        }
+      });
+    }
+
+    // ==============================================
+    // QUIZ ENGINE
+    // ==============================================
+    function startNewQuiz() {
+      document.getElementById('quiz-card-container').classList.remove('hidden');
+      document.getElementById('quiz-summary').classList.add('hidden');
+      quizScore = 0;
+      currentQuizIndex = 0;
+      quizAnswered = false;
+
+      // Generate 10 randomized quiz questions from dataset
+      const shuffledWords = [...B1_VOCABULARY_DATA].sort(() => 0.5 - Math.random());
+      const selected = shuffledWords.slice(0, 10);
+
+      quizQuestions = selected.map((item, idx) => {
+        // Decide question format:
+        // 50% Cloze / Example sentence completion, 50% Definition / Translation match
+        const isCloze = Math.random() > 0.4 && item.example.toLowerCase().includes(item.word.toLowerCase());
+        
+        let promptText = "";
+        let questionType = "";
+
+        if (isCloze) {
+          // Replace word in example with blanks
+          const regex = new RegExp(item.word, 'gi');
+          promptText = item.example.replace(regex, "______");
+          questionType = "Rellena el hueco con la palabra correcta:";
+        } else {
+          promptText = `¿Qué término B1 significa: "${item.translation}" (${item.definition})?`;
+          questionType = "Selecciona la palabra B1 correspondiente:";
+        }
+
+        // Generate distractors from same or similar category
+        const distractors = B1_VOCABULARY_DATA
+          .filter(w => w.id !== item.id)
+          .sort(() => 0.5 - Math.random())
+          .slice(0, 3)
+          .map(w => w.word);
+
+        const options = [item.word, ...distractors].sort(() => 0.5 - Math.random());
+
+        return {
+          questionNumber: idx + 1,
+          wordItem: item,
+          prompt: promptText,
+          typeLabel: questionType,
+          correctAnswer: item.word,
+          options: options
+        };
+      });
+
+      renderQuizQuestion();
+    }
+
+    function renderQuizQuestion() {
+      if (currentQuizIndex >= quizQuestions.length) {
+        showQuizSummary();
+        return;
+      }
+
+      quizAnswered = false;
+      const q = quizQuestions[currentQuizIndex];
+
+      document.getElementById('quiz-question-number').innerText = `Pregunta ${q.questionNumber} de ${quizQuestions.length}`;
+      document.getElementById('quiz-category-tag').innerText = q.wordItem.category;
+      document.getElementById('quiz-type-label').innerText = q.typeLabel;
+      document.getElementById('quiz-prompt').innerText = q.prompt;
+      document.getElementById('quiz-score-display').innerText = `${quizScore} / ${quizQuestions.length}`;
+
+      // Reset feedback box
+      const feedback = document.getElementById('quiz-feedback');
+      feedback.className = "hidden p-4 rounded-2xl border text-sm";
+      feedback.innerHTML = `
+        <div class="flex items-start gap-3">
+          <div id="quiz-feedback-icon" class="text-xl mt-0.5"></div>
+          <div class="space-y-1">
+            <h4 id="quiz-feedback-title" class="font-bold"></h4>
+            <p id="quiz-feedback-text" class="text-slate-600 text-xs sm:text-sm"></p>
+          </div>
+        </div>
+        <div class="mt-4 flex justify-end">
+          <button id="quiz-next-btn" onclick="nextQuizQuestion()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-sm transition flex items-center gap-2">
+            Siguiente <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      `;
+
+      // Render options
+      const optionsContainer = document.getElementById('quiz-options');
+      optionsContainer.innerHTML = q.options.map(opt => `
+        <button onclick="handleQuizAnswer('${opt}')" class="quiz-opt-btn w-full p-4 text-left font-semibold text-slate-800 bg-slate-50 hover:bg-indigo-50/70 border border-slate-200 hover:border-indigo-300 rounded-2xl transition duration-150 flex items-center justify-between">
+          <span>${opt}</span>
+          <i class="fa-regular fa-circle text-slate-300 text-base opt-icon"></i>
+        </button>
+      `).join('');
+    }
+
+    function handleQuizAnswer(selectedWord) {
+      if (quizAnswered) return;
+      quizAnswered = true;
+
+      const q = quizQuestions[currentQuizIndex];
+      const isCorrect = (selectedWord === q.correctAnswer);
+      if (isCorrect) quizScore++;
+
+      document.getElementById('quiz-score-display').innerText = `${quizScore} / ${quizQuestions.length}`;
+
+      // Style option buttons
+      const buttons = document.querySelectorAll('.quiz-opt-btn');
+      buttons.forEach(btn => {
+        const text = btn.querySelector('span').innerText;
+        btn.disabled = true;
+        if (text === q.correctAnswer) {
+          btn.className = "quiz-opt-btn w-full p-4 text-left font-bold text-emerald-900 bg-emerald-50 border-2 border-emerald-500 rounded-2xl flex items-center justify-between";
+          btn.querySelector('.opt-icon').className = "fa-solid fa-circle-check text-emerald-600 text-lg";
+        } else if (text === selectedWord && !isCorrect) {
+          btn.className = "quiz-opt-btn w-full p-4 text-left font-bold text-rose-900 bg-rose-50 border-2 border-rose-500 rounded-2xl flex items-center justify-between";
+          btn.querySelector('.opt-icon').className = "fa-solid fa-circle-xmark text-rose-600 text-lg";
+        } else {
+          btn.className = "quiz-opt-btn w-full p-4 text-left font-medium text-slate-400 bg-slate-50 border border-slate-200 rounded-2xl opacity-60 flex items-center justify-between";
+        }
+      });
+
+      // Show Feedback
+      const feedback = document.getElementById('quiz-feedback');
+      const icon = document.getElementById('quiz-feedback-icon');
+      const title = document.getElementById('quiz-feedback-title');
+      const text = document.getElementById('quiz-feedback-text');
+
+      feedback.classList.remove('hidden');
+      if (isCorrect) {
+        feedback.classList.add('bg-emerald-50/80', 'border-emerald-200', 'text-emerald-900');
+        icon.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-600"></i>';
+        title.innerText = "¡Correcto!";
+        text.innerHTML = `<b>${q.wordItem.word}</b> (${q.wordItem.pos}): ${q.wordItem.translation}. <i>"${q.wordItem.example}"</i>`;
+      } else {
+        feedback.classList.add('bg-rose-50/80', 'border-rose-200', 'text-rose-900');
+        icon.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-rose-600"></i>';
+        title.innerText = `Incorrecto. La respuesta era: ${q.correctAnswer}`;
+        text.innerHTML = `<b>${q.wordItem.word}</b> significa: ${q.wordItem.translation}. <i>"${q.wordItem.example}"</i>`;
+      }
+    }
+
+    function nextQuizQuestion() {
+      currentQuizIndex++;
+      renderQuizQuestion();
+    }
+
+    function showQuizSummary() {
+      document.getElementById('quiz-card-container').classList.add('hidden');
+      const summary = document.getElementById('quiz-summary');
+      summary.classList.remove('hidden');
+
+      document.getElementById('quiz-final-score').innerText = `${quizScore} / ${quizQuestions.length}`;
+      
+      const pct = (quizScore / quizQuestions.length) * 100;
+      let msg = "";
+      if (pct >= 80) {
+        msg = "¡Excelente! Tienes un dominio sobresaliente del vocabulario B1 para Linguaskill.";
+      } else if (pct >= 60) {
+        msg = "¡Buen trabajo! Estás en nivel B1 estándar. Repasa las palabras falladas en las flashcards.";
+      } else {
+        msg = "Te recomendamos revisar las tarjetas por categorías para reforzar los términos clave.";
+      }
+      document.getElementById('quiz-final-message').innerText = msg;
+    }
+
+    // ==============================================
+    // DICTIONARY / GLOSSARY VIEW
+    // ==============================================
+    function renderDictionary() {
+      const query = (document.getElementById('dict-search-input')?.value || "").toLowerCase().trim();
+      const container = document.getElementById('dict-cards-container');
+      if (!container) return;
+
+      let filtered = B1_VOCABULARY_DATA;
+
+      if (currentCategory !== 'all') {
+        filtered = filtered.filter(item => item.category === currentCategory);
+      }
+
+      if (query) {
+        filtered = filtered.filter(item => 
+          item.word.toLowerCase().includes(query) ||
+          item.translation.toLowerCase().includes(query) ||
+          item.definition.toLowerCase().includes(query) ||
+          item.example.toLowerCase().includes(query)
+        );
+      }
+
+      document.getElementById('dict-results-count').innerText = filtered.length;
+
+      container.innerHTML = filtered.map(item => {
+        const isMastered = masteryState[item.id] === true;
+        return `
+          <div class="bg-white p-5 rounded-2xl border ${isMastered ? 'border-emerald-300 bg-emerald-50/10' : 'border-slate-200'} shadow-sm hover:shadow-md transition flex flex-col justify-between space-y-3">
+            <div>
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <h4 class="text-xl font-bold text-slate-900 leading-tight">${item.word}</h4>
+                  <span class="text-xs font-semibold text-indigo-500 uppercase tracking-wider">${item.pos}</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <button onclick="speakWord('${item.word}')" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-indigo-100 text-slate-600 hover:text-indigo-600 flex items-center justify-center transition" title="Escuchar">
+                    <i class="fa-solid fa-volume-high text-xs"></i>
+                  </button>
+                  <button onclick="toggleMasteryFromDict(${item.id})" class="w-8 h-8 rounded-full ${isMastered ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-400 hover:text-emerald-600'} flex items-center justify-center transition" title="Marcar como dominada">
+                    <i class="fa-solid fa-check text-xs"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="mt-2.5">
+                <p class="text-sm font-semibold text-indigo-950">${item.translation}</p>
+                <p class="text-xs text-slate-500 mt-0.5 italic">${item.definition}</p>
+              </div>
+            </div>
+
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-xs text-slate-700">
+              <span class="font-bold text-indigo-600 block mb-0.5">Ejemplo:</span>
+              "${item.example}"
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function toggleMasteryFromDict(id) {
+      masteryState[id] = !masteryState[id];
+      saveMasteryState();
+      updateProgressBar();
+      renderDictionary();
+    }
+
+    function filterDictionary() {
+      renderDictionary();
+    }
+  </script>
+</body>
+</html>
