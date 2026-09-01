@@ -2014,6 +2014,29 @@ const B1_VOCABULARY_DATA = [
   { id: 1905, word: "weather", pos: "noun (uncount)", translation: "tiempo, clima (estado del tiempo)", definition: "The state of the atmosphere at a place and time regarding heat, cloudiness, dryness, sunshine, wind, and rain.", example: "What is the weather like in London at this time of year?", category: "weather" },
   { id: 1906, word: "wet", pos: "adj", translation: "mojado/a, lluvioso/a", definition: "Covered or saturated with water or another liquid; rainy.", example: "Drive carefully because the roads are wet and slippery from the rain.", category: "weather" },
   { id: 1907, word: "wind", pos: "noun", translation: "viento", definition: "The perceptible natural movement of the air, especially in the form of a current of air blowing from a particular direction.", example: "A strong wind was blowing fallen leaves along the street.", category: "weather" },
-  { id: 1908, word: "windy", pos: "adj", translation: "ventoso/a, con viento", definition: "Characterized by or exposed to strong winds.", example: "It was too windy to put up the beach umbrella.", category: "weather" }
+  { id: 1908, word: "windy", pos: "adj", translation: "ventoso/a, con viento", definition: "Characterized by or exposed to strong winds.", example: "It was too windy to put up the beach umbrella.", category: "weather" },
+
+  
+  // ==========================================
+  // --- ESSENTIAL B1 PHRASAL VERBS ---
+  // ==========================================
+  { id: 1909, word: "break down", pos: "phr verb", translation: "averiarse, estropearse / derrumbarse", definition: "To stop working (of a machine or vehicle), or to lose emotional control.", example: "Our car broke down on the motorway on our way to the airport.", category: "phrasal" },
+  { id: 1910, word: "carry on", pos: "phr verb", translation: "continuar, seguir", definition: "To continue an activity or task.", example: "Please carry on with your reading exercises while I check attendance.", category: "phrasal" },
+  { id: 1911, word: "catch up (with)", pos: "phr verb", translation: "ponerse al día / alcanzar", definition: "To reach the same standard or level as others, or exchange news.", example: "We met at a café to catch up on each other's news.", category: "phrasal" },
+  { id: 1912, word: "check in", pos: "phr verb", translation: "facturar / registrarse", definition: "To register at a hotel or airport.", example: "You must check in at least two hours before your international flight.", category: "phrasal" },
+  { id: 1913, word: "find out", pos: "phr verb", translation: "enterarse, averiguar, descubrir", definition: "To discover or obtain information about something.", example: "I need to find out what time the exam results are published.", category: "phrasal" },
+  { id: 1914, word: "get along / on (with)", pos: "phr verb", translation: "llevarse bien (con)", definition: "To have a harmonious or friendly relationship with someone.", example: "She gets on very well with all her new colleagues at work.", category: "phrasal" },
+  { id: 1915, word: "give up", pos: "phr verb", translation: "rendirse / dejar un hábito", definition: "To stop trying, or to cease doing an activity or habit.", example: "Don't give up; learning English vocabulary takes daily consistency.", category: "phrasal" },
+  { id: 1916, word: "go on", pos: "phr verb", translation: "continuar / ocurrir, pasar", definition: "To continue, or to happen.", example: "What is going on in the main square this afternoon?", category: "phrasal" },
+  { id: 1917, word: "look after", pos: "phr verb", translation: "cuidar de, atender", definition: "To take care of or be responsible for someone or something.", example: "Can you look after my cat while I am away on holiday?", category: "phrasal" },
+  { id: 1918, word: "look for", pos: "phr verb", translation: "buscar", definition: "To attempt to find someone or something.", example: "I am looking for my car keys; have you seen them?", category: "phrasal" },
+  { id: 1919, word: "look forward to", pos: "phr verb", translation: "esperar con ilusión / tener muchas ganas de", definition: "To feel excited or enthusiastic about a future event.", example: "I am really looking forward to visiting London next month.", category: "phrasal" },
+  { id: 1920, word: "pick up", pos: "phr verb", translation: "recoger (en coche/a alguien) / aprender sobre la marcha", definition: "To collect someone in a vehicle, or acquire knowledge effortlessly.", example: "I will pick you up outside the train station at five o'clock.", category: "phrasal" },
+  { id: 1921, word: "put off", pos: "phr verb", translation: "posponer, aplazar", definition: "To delay an event or arrangement until a later time.", example: "They decided to put off the match until the weather cleared.", category: "phrasal" },
+  { id: 1922, word: "set off / out", pos: "phr verb", translation: "ponerse en camino, partir, iniciar un viaje", definition: "To begin a journey.", example: "We set off early in the morning to avoid the highway traffic.", category: "phrasal" },
+  { id: 1923, word: "take off", pos: "phr verb", translation: "despegar (avión) / quitarse (ropa)", definition: "To become airborne, or to remove clothing.", example: "Please take off your heavy winter coat when you come inside.", category: "phrasal" },
+  { id: 1924, word: "turn down", pos: "phr verb", translation: "bajar (volumen/calefacción) / rechazar", definition: "To reduce the volume/heat, or refuse an offer.", example: "Could you please turn down the television volume a little?", category: "phrasal" },
+  { id: 1925, word: "turn up", pos: "phr verb", translation: "subir (volumen) / presentarse, aparecer", definition: "To increase volume, or to arrive unexpectedly.", example: "He didn't turn up for the morning lecture today.", category: "phrasal" },
+  { id: 1926, word: "warm up", pos: "phr verb", translation: "calentar (ejercicio o comida)", definition: "To prepare for physical exertion by exercising gently.", example: "Always warm up your muscles before going for a fast run.", category: "phrasal" }
 
 ];
